@@ -37,35 +37,33 @@ void check()
 
 int main()
 {
-	int rs = 0, ge = 0, g = 0, rsAsn = 0;
+	
 	int i = 0;
 	char store[15];
+
 	printf("\nEner: ");
 	scanf("%[^\n]", store);
 	
 	while(store[i] != '\0')
 	{
 		if( store[i] == '>' && count < 3)
-		{
 			count++;
-			i++;
-			continue;
-		}
+			
 		if( store[i] != '>' && store[i] != '=')
 		{
 			check();
 			
 			count = 0;
 			equal = 0;
-			i++;
-			continue;	
+				
 		}
+
 		if( store[i] == '=' && (count == 1 || count == 2))
-		{			
 			equal++;
-			i++;
-			continue;
-		}
+
+		i++;
+        if(store[i] == '\0')
+            check();
 		
 	}
 	
