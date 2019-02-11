@@ -41,7 +41,7 @@ int main()
 	int i = 0;
 	char store[15];
 
-	printf("\nEner: ");
+	printf("\nEnter: ");
 	scanf("%[^\n]", store);
 	
 	while(store[i] != '\0')
