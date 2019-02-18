@@ -106,7 +106,6 @@ void delete(int value)
 
 int main()
 {
-    //struct hash hashTable[tableSize];
     int count = 0;
 
     int temp;
@@ -131,7 +130,7 @@ int main()
                     printf("\nTable Full! ABORT!");
                     break;
                 }
-                insert(temp, doubleHash(temp,choice));
+                insert(temp, doubleHash(temp,count));
                 count++;
                 display();
                 break;
