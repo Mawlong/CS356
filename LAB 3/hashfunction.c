@@ -1,167 +1,236 @@
 /*
 
-    To implement open addressing using Double Hashing
+    To implement open addressing using Double Hashing for strings
 
 */
 
-
 #include<stdio.h>
-
-#define tableSize 10
-
-
-struct hash
+#include<math.h>
+#include<string.h>
+ 
+struct data
 {
-    int key;
-    int value;
+	int key;
+	char value[10];
 };
-
-struct hash hashTable[tableSize];
-
-void populateInitial()
+ 
+struct hashtable_item 
 {
-    int i = 0;
-
-    // We use  the value -1 to indicate a value of NIL at the key position
-
-    for(i;i<tableSize;i++)
-        hashTable[i].key = -1;
-}
-
-int auxilaryHash1(int value)
+ 
+	int flag;
+	/*
+	 * flag = 0 : data not present
+	 * flag = 1 : some data already present
+	 * flag = 2 : data was present,but deleted
+	*/
+	struct data *item;
+ 
+};
+ 
+struct hashtable_item *array;
+int max = 7;
+int size = 0;
+int prime = 3;
+ 
+int hashcode1(int key)
 {
-
-    // here 7 is a Prime number less than table size
-
-    return (value % 7);
+	return (key % max);
 }
-
-int auxilaryHash2(int value)
+ 
+int hashcode2(int key)
 {
-    return (value % 8);
+	return (prime - (key % prime));
 }
-
-int doubleHash(int value, int control)
+ 
+void insert(int key, char value[])
 {
-    if(control == tableSize)
-        return -1;
-    else
-    {
-        return (auxilaryHash1(value) + (control * auxilaryHash2(value) ) %7 );
-    }
-    
+	int hash1 = hashcode1(key);
+	int hash2 = hashcode2(key);
+ 
+	int index = hash1;
+ 
+	/* create new data to insert */
+	struct data *new_item = (struct data*) malloc(sizeof(struct data));
+	new_item->key = key;
+	strcpy(new_item->value, value);
+ 
+	if (size == max) 
+        {
+		printf("\n Hash Table is full, cannot insert more items \n");
+		return;
+	}
+ 
+	/* probing through other array elements */
+	while (array[index].flag == 1) {
+		if (array[index].item->key == key)
+                {
+			printf("\n Key already present, hence updating its value \n");
+			strcpy(array[index].item->value, value);
+			return;
+		}
+		index = (index + hash2) % max; 
+		if (index == hash1)
+                {
+			printf("\n Add is failed \n");
+			return;
+		}
+		printf("\n probing \n");
+ 
+	}
+ 
+	array[index].item = new_item;
+	array[index].flag = 1;
+	size++;
+	printf("\n Key (%d) has been inserted \n", key);
+ 
 }
-
-int searchHash(int value)
+ 
+/* to remove an element from the array */
+void remove_element(int key)
 {
-    int i = 0;
-    int findKey;
-    while(i<tableSize)
-    {
-        findKey = doubleHash(value,i);
-
-        if(hashTable[findKey].value == value)
-            return findKey;
-        
-        i++;
-    }
-    return -1;
+	int hash1 = hashcode1(key);
+	int hash2 = hashcode2(key);
+	int index = hash1;
+ 
+	if (size == 0)
+        {
+		printf("\n Hash Table is empty \n");
+		return;
+	}
+ 
+	/* probing through other elements */
+	while (array[index].flag != 0)
+        {
+		if (array[index].flag == 1  &&  array[index].item->key == key)
+                {
+			array[index].item = NULL;
+			array[index].flag = 2;
+			size--;
+			printf("\n Key (%d) has been removed \n", key);
+			return;
+		}
+		index = (index + hash2) % max;
+		if (index == hash1)
+                {
+			break;
+		}
+	}
+ 
+	printf("\n Key (%d) does not exist \n", key);
+ 
 }
-
+ 
+int size_of_hashtable()
+{
+	return size;
+}
+ 
+/* displays all elements of array */
 void display()
 {
-    int i = 0;
-    printf("\nValue\tKey\n");
-    for(i;i<tableSize;i++)
-    {
-        if(hashTable[i].key == -1)
-            continue;
-        else
+    printf("\nIndex\tKey\t\tValue");
+	int i;
+	for (i = 0; i < max; i++)
         {
-            printf("\n%d\t%d",hashTable[i].value,hashTable[i].key);
-        }
-        
-    }
+		if (array[i].flag != 1)
+                {
+			printf("\n%d  \t - \t\t -  ", i);
+		}
+		else
+                {
+			printf("\n%d  \t %d \t\t %s", i, array[i].item->key, array[i].item->value);
+		}
+	}
 }
-void insert(int store, int key)
+ 
+/* returns largest prime number less than size of array */
+int get_prime()
 {
-    hashTable[key].key = key;
-    hashTable[key].value = store;
+	int i,j;
+	for (i = max - 1; i >= 1; i--)
+        {
+		int flag = 0;
+		for (j = 2; j <= (int)sqrt(i); j++)
+                {
+			if (i % j == 0)
+                        {
+				flag++;
+			}
+		}
+		if (flag == 0)
+                {
+			return i;
+		}
+	}
+	return 3;
+ 
 }
 
-void delete(int value)
+/* initializes array */
+void init_array()
 {
-    int key;
-    key = searchHash(value);
-    if(key == -1)
-    {    
-        printf("\nValue does not exist.");
-    }
-    else
-    {
-        hashTable[key].key = -1;
-    }   
-
+	int i;
+	for(i = 0; i < max; i++)
+        {
+		array[i].item = NULL;
+		array[i].flag = 0;
+	}
+	prime = get_prime();
 }
-
+ 
 int main()
 {
-    int count = 0;
-
-    int temp;
-
-    int choice;
-    int searched;
-
-    populateInitial();
-
-    while(1)
-    {
-        printf("\nPlease Enter your choice:\n1.Insert\n2.Search\n3.Delete\n");
-        scanf("%d",&choice);
-
-        switch(choice)
-        {
-            case 1:
-                printf("\nEnter the value to be inserted: ");
-                scanf("%d", &temp);
-                if(count >= tableSize)
+	int choice, key, n, c;
+    char value[10];
+	printf("\nEnter the size of the hash table: ");
+    scanf("%d", &max);
+ 
+	array = (struct hashtable_item*) malloc(max * sizeof(struct hashtable_item));
+	init_array();
+ 
+	do {
+		printf("Implementation of Hash Table in C with Double Hashing.\n\n");
+		printf("MENU-: \n1.Inserting item in the Hash Table" 
+                              "\n2.Removing item from the Hash Table" 
+                              "\n3.Display Hash Table"
+		       "\n\n Please enter your choice-:");
+ 
+		scanf("%d", &choice);
+ 
+		switch(choice) 
                 {
-                    printf("\nTable Full! ABORT!");
-                    break;
-                }
-                insert(temp, doubleHash(temp,count));
-                count++;
-                display();
-                break;
-            
-            case 2:
-                
-                printf("\nEnter the value to be searched: ");
-                scanf("%d", &temp);
-                searched = searchHash(temp);
-                if(searched == -1)
-                    printf("\nValue not found");
-                else
-                {
-                    printf("\nValue available at key value %d",hashTable[searched].key);
-                }
-                
-                break;
-
-            case 3:
-                printf("\nEnter an Element to be deleted: ");
-                scanf("%d", &temp);
-                delete(temp);
-                display();
-                break;
-            
-            default:
-                printf("\nWrong Choice!");
-        }
-        printf("\nWant to continue? press 1\n");
-        scanf("%d", &choice);
-        if(choice != 1)
-            break;
-    }
+ 
+		case 1:
+ 
+		      printf("Inserting element in Hash Table\n");
+		      printf("Enter key and value-:\t");
+		      scanf("%d %s", &key, value);
+		      insert(key, value);
+ 
+		      break;
+ 
+   		case 2:
+ 
+		      printf("Deleting in Hash Table \n Enter the key to delete-:");
+		      scanf("%d", &key);
+		      remove_element(key);
+ 
+		      break;
+ 
+		case 3:
+ 
+		      display();
+ 
+		      break;
+ 
+		default:
+ 
+		       printf("Wrong Input\n");
+ 
+		}
+ 
+		printf("\n Do you want to continue-:(press 1 for yes)\t");
+		scanf("%d", &c);
+ 
+	}while(c == 1); 
 }
