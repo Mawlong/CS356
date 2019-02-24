@@ -180,6 +180,7 @@ void init_array()
  
 int main()
 {
+<<<<<<< HEAD
 	int choice, key, n, c;
     char value[10];
 	printf("\nEnter the size of the hash table: ");
@@ -233,4 +234,64 @@ int main()
 		scanf("%d", &c);
  
 	}while(c == 1); 
+=======
+    int count = 0;
+
+    int temp;
+
+    int choice;
+    int searched;
+
+    populateInitial();
+
+    while(1)
+    {
+        printf("\nPlease Enter your choice:\n1.Insert\n2.Search\n3.Delete\n");
+        scanf("%d",&choice);
+
+        switch(choice)
+        {
+            case 1:
+                printf("\nEnter the value to be inserted: ");
+                scanf("%d", &temp);
+                if(count >= tableSize)
+                {
+                    printf("\nTable Full! ABORT!");
+                    break;
+                }
+                insert(temp, doubleHash(temp,count));
+                count++;
+                display();
+                break;
+            
+            case 2:
+                
+                printf("\nEnter the value to be searched: ");
+                scanf("%d", &temp);
+                searched = searchHash(temp);
+                if(searched == -1)
+                    printf("\nValue not found");
+                else
+                {
+                    printf("\nValue available at key value %d",hashTable[searched].key);
+                }
+                
+                break;
+
+            case 3:
+                printf("\nEnter an Element to be deleted: ");
+                scanf("%d", &temp);
+                delete(temp);
+                display();
+                break;
+            
+            default:
+                printf("\nWrong Choice!");
+        }
+        printf("\nWant to continue? press 1\n");
+        scanf("%d", &choice);
+        if(choice != 1)
+            break;
+    }
+>>>>>>> 5ec6f2388570888986af2bcd5aec137c89e0b93f
 }
