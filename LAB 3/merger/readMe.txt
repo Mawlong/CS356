@@ -1,0 +1,1 @@
+To merge Hash table function and sentence recognition
